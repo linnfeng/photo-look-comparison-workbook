@@ -1,0 +1,72 @@
+name: Deploy workbook to Pages
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+concurrency:
+  group: pages
+  cancel-in-progress: false
+jobs:
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Build independent static workbook
+        run: |
+          mkdir -p _site
+          cat > _site/index.html <<'PAGE_HTML'
+          <!doctype html>
+          <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Photo Look Comparison Workbook</title><style>body{font:17px/1.6 system-ui,sans-serif;max-width:850px;margin:2em auto;padding:0 1em}table{border-collapse:collapse}td{border:1px solid #777;padding:.4em}code{background:#eee}a{color:#173fa3}</style></head><body><main>
+          <h1>Photo Look Comparison Workbook</h1>
+          <p>This workbook is a practical, tool-independent way to review two edits of the same photograph. It helps a creator separate a change in crop from a change in color, record permission and audience decisions, and explain why an image was selected. It is intended for creative and educational use. It is not a technical inspection method, evidence of image authenticity, or a substitute for an editor&#x27;s judgment.</p>
+          <p>The examples are hypothetical. They are prompts for a review, not results of a study. You can copy the worksheet sections into a local document, a paper notebook, or a project management tool; no account or command-line installation is required. Keep the record with the project rather than posting photographs or private information in a public issue.</p>
+          <h2>Disclosure and an optional tool</h2>
+          <p>I am associated with Y2K Photo Lab, and AI assistance helped prepare this workbook. One optional tool for trying an early-digital appearance is the <a href="https://y2kphotoeditor.online/">2000s photo editor</a>. It runs in a browser and offers looks, strength adjustments, comparison with the original and cropping. Studio adds more detailed controls, custom stamps, larger exports and batch editing. Check the official site for current features, terms and pricing. This mention is not an independent product test and is not a claim that all features are free.</p>
+          <p>You do not need to use that tool. The same comparison can be carried out with another editor or with manually prepared images. The point is to record what changed and why, not to make a particular preset the correct answer.</p>
+          <h2>1. Set a purpose for the image</h2>
+          <p>Before opening an editor, write down the intended format and audience. A picture for a small profile may need a simple background and a clear face; a wide editorial illustration may need context around the subject. The same crop can be successful in one place and confusing in another. Avoid using “make it look better” as the only objective because it does not tell a reviewer what to check.</p>
+          <p>Fill in these prompts:</p>
+          <ul><li><strong>Intended use:</strong> Where will the image appear, and for how long?</li><li><strong>Audience:</strong> Who is expected to see it, and is the space public or private?</li><li><strong>Essential content:</strong> What must remain visible or understandable?</li><li><strong>Constraints:</strong> Is there a required aspect ratio, caption, size or deadline?</li><li><strong>Decision owner:</strong> Who can approve the final version?</li></ul>
+          <p>If the answer to any question changes later, note the change. A version that worked in a private presentation may not be appropriate as a public thumbnail. A second review is useful when the audience expands or when an image is reused for a new purpose.</p>
+          <h2>2. Preserve the original and check permission</h2>
+          <p>Keep the source file unchanged. Work from a copy and use a naming scheme that distinguishes the original from the edits, for example <code>original</code>, <code>version-a</code>, and <code>version-b</code>. Include a short note about where the source came from and whether the people or organizations represented in it have granted the necessary permission. Do not assume that a picture found online is available for reuse.</p>
+          <p>If the image contains a person who has not agreed to a public post, choose a different source or obtain permission before publishing. If a project uses client material, follow the agreement governing that material. For a practice exercise, use your own photograph, a deliberately staged image, or a properly licensed source. Keep sensitive contact information out of the workbook unless it is actually needed for the handoff.</p>
+          <p>The record is not legal advice. It is a reminder to ask the right questions before a file leaves the project. When rights are uncertain, resolve them with the appropriate person rather than asking an image editor or a text generator to decide.</p>
+          <h2>3. Choose a baseline and two variants</h2>
+          <p>Pick a baseline crop first. Then make two versions that differ in one principal respect. For example, keep the crop fixed and compare a restrained warm treatment with a stronger warm treatment. If one version also changes orientation, contrast and framing, a reviewer cannot easily identify which change drove the preference.</p>
+          <p>A comparison does not have to be perfectly controlled to be useful, but the record should be honest about what varies. When several settings change together, label the result a combined treatment rather than claiming that a single adjustment caused the response. Save the settings if the editor makes that possible, or write down the visible controls and the approximate choices you made.</p>
+          <p>Use this small table to prepare the session:</p>
+          <table><tr><td>Field</td><td>Baseline</td><td>Version A</td><td>Version B</td></tr><tr><td>Crop or ratio</td><td></td><td></td><td></td></tr><tr><td>Main color change</td><td></td><td></td><td></td></tr><tr><td>Texture or grain</td><td></td><td></td><td></td></tr><tr><td>Contrast and brightness</td><td></td><td></td><td></td></tr><tr><td>Export dimensions</td><td></td><td></td><td></td></tr><tr><td>Notes</td><td></td><td></td><td></td></tr></table>
+          <p>Do not invent numbers for controls that were not measured. If a slider has no displayed value, a plain-language note such as “low grain” is more honest than a fabricated percentage. Record the date and software version only when you know them.</p>
+          <h2>4. Review at more than one size</h2>
+          <p>Look at all three files at the size in which they will actually be used. Then inspect them at a larger size for unintended artifacts. A texture that is attractive on a large screen may compete with a face in a small square. Conversely, an apparently subtle crop can remove a piece of context that matters in a full-width image.</p>
+          <p>Use the same viewing conditions as far as practical. Put the files side by side or switch between them without changing zoom. If you can, repeat the check on another display, but do not claim color accuracy simply because two screens look similar. Record the display and viewing conditions if the decision depends on fine color differences.</p>
+          <p>Separate observations from preferences. “The sign is difficult to read at the target size” can be checked by another viewer. “The warmer image feels more welcoming” is a preference that may differ across people. Both are legitimate; labeling them makes the review more useful and avoids turning taste into a false measurement.</p>
+          <h2>5. Use a neutral review sheet</h2>
+          <p>Ask reviewers the same questions before showing them the creator&#x27;s preferred version. Offer a “neither” option and invite a short explanation. A suggested set of prompts follows:</p>
+          <ol><li>What did you notice first in each version?</li><li>Is the intended subject recognizable at the target size?</li><li>Has the crop removed something needed to understand the image?</li><li>Does texture or grain obscure a detail that matters?</li><li>Which version suits the stated audience, and why?</li><li>What single change would make the chosen version easier to use?</li></ol>
+          <p>Keep the answers proportionate to the decision. A social profile picture does not require a formal research process. If several reviewers disagree, document the reason for the final choice instead of presenting the number of votes as proof that an image is objectively superior. A minority comment about privacy or a missing detail may be more important than a majority preference for color.</p>
+          <h2>6. Check context and captions</h2>
+          <p>An old-camera effect can imply that a new picture is an archive. Where dates matter, keep the true capture date and explain that the appearance was edited. Do not use decorative effects to imply a historical event, endorsement, or result that did not occur. Check names, places and credits independently before publishing a caption.</p>
+          <p>For scientific, medical, legal, architectural or other consequential records, the requirements may be stricter. Preserve original files, follow the applicable integrity rules, and do not use a decorative edit as the sole basis for a technical conclusion. If the image documents a condition, ask a qualified person what processing is permitted. This workbook does not provide domain-specific validation.</p>
+          <h2>7. Create a handoff that another person can understand</h2>
+          <p>When you finish, keep a short decision record alongside the selected output:</p>
+          <ul><li>Source file and permission status.</li><li>Intended use, audience and dimensions.</li><li>Selected version and the reason for selecting it.</li><li>Major changes, including crop, color and texture.</li><li>Known limitations or unresolved questions.</li><li>The location of the untouched original.</li></ul>
+          <p>Avoid storing passwords, private links or unrelated personal information in a public repository. If a colleague needs access to an original file, use an approved private transfer method and confirm that they received the correct version. A good handoff tells the next person what to do if the image needs another crop or a new audience changes the requirements.</p>
+          <h2>8. Run a final, reversible check</h2>
+          <p>Before sharing, compare the chosen export with the source one more time. Confirm that the file opens, the intended crop is present, the caption is accurate, and the people shown are comfortable with the planned use. Revisit the permission decision if the destination has changed. If a problem appears, return to the preserved original rather than repeatedly editing a compressed export.</p>
+          <p>A short checklist is valuable because it makes creative judgment visible without pretending to automate it. The creator remains responsible for the final image, the permissions, and the context in which viewers encounter it.</p>
+          </main></body></html>
+          PAGE_HTML
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+      - id: deployment
+        uses: actions/deploy-pages@v4
